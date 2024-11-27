@@ -82,8 +82,7 @@
             return $stms->fetchAll();
         }
         
-
-        public function getByAcademicCHaracter($caracterAcademico){
+        public function getByAcademicCHaracterById($caracterAcademico){
             $query = "
                 SELECT instP.nomb_inst,mun.nomb_munic,dept.nomb_depto,inst.direccion,cad.nomb_academ
                 FROM instituciones instP
@@ -98,8 +97,21 @@
             $stms->bindParam('caracter_academico',$caracterAcademico);
             $stms->execute();
             return $stms->fetchAll();
+        }        
+        public function getByAcademicCHaracter(){
+            $query = "
+                SELECT instP.nomb_inst,mun.nomb_munic,dept.nomb_depto,inst.direccion,cad.nomb_academ
+                FROM instituciones instP
+                JOIN cobertura c ON c.cod_inst = instP.cod_inst
+                JOIN municipios mun ON mun.cod_munic = c.cod_munic
+                JOIN departamentos dept ON dept.cod_depto = mun.cod_depto
+                JOIN inst_por_municipio inst  ON inst.cod_inst = instP.cod_inst
+                JOIN caracter_academico cad ON cad.cod_academ = instP.cod_academ;
+            ";
+            $stms = $this->db->prepare($query);
+            $stms->execute();
+            return $stms->fetchAll();
         }
-
 
         public function instBySector($codSector){
             $query = "

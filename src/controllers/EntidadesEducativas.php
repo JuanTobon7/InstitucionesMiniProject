@@ -67,7 +67,13 @@ class EntidadesEducativas {
         return $this->service->getInstByDeptStatus($codEstado,$codDept);
     }
     public function getByAcademicCHaracter($caracterAcademico){
-        $entidadesEducativas = $this->service->getByAcademicCHaracter($caracterAcademico);
+        $entidadesEducativas = null;
+        printf("hellooooouuuuu".$caracterAcademico);
+        if($caracterAcademico == null){
+            $entidadesEducativas = $this->service->getByAcademicCHaracter();
+        }else{            
+            $entidadesEducativas = $this->service->getByAcademicCHaracterById($caracterAcademico);
+        }
         return $entidadesEducativas;
     }
     public function instBySector($codSector){
