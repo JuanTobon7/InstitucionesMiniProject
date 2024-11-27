@@ -80,12 +80,7 @@
             $institucionesActivas[] = 0; // Para mantener el índice alineado
         }
     }
-    
-    foreach ($institucionesPorNormaCreacion as $norma) {
-        $normasCreacion[] = $norma['nomb_norma'];
-        $totalInstitucionesPorNorma[] = $norma['total_inst'];
-    }
-    
+        
     foreach ($institucionesPorNormaCreacion as $norma) {
         $normasCreacion[] = $norma['nomb_norma'];
         $totalInstitucionesPorNorma[] = $norma['total_inst'];
