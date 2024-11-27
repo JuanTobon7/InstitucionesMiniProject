@@ -1,8 +1,8 @@
 <?php
-require_once '../../controllers/EntidadesEducativas.php';
+require_once '../../controllers/Instituciones.php';
 
 // Crear una instancia del controlador
-$entidadesEducativas = new EntidadesEducativas();
+$entidadesEducativas = new Instituciones();
 $instituciones = $entidadesEducativas->getAll();
 ?>
 
@@ -39,9 +39,7 @@ $instituciones = $entidadesEducativas->getAll();
                             <td class="py-2 px-4 border-b"><?php echo htmlspecialchars($institucion['cod_sector']); ?></td>
                             <td class="py-2 px-4 border-b"><?php echo htmlspecialchars($institucion['cod_academ']); ?></td>
                             <td class="py-2 px-4 border-b flex items-center gap-2">
-                                <button href="./CreateInstitucionMunicipio.php" class="px-1 rounded-md bg-green-500 flex items-center cursor-pointer hover:bg-green-600">
-                                    <i class="material-icons text-white">add</i>
-                                </button>
+                               
                                 <form action="../../controllers/EntidadesEducativas.php?action=delete" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta institución?');">
                                     <input type="hidden" name="cod_inst" value="<?php echo htmlspecialchars($institucion['cod_inst']); ?>">
                                     <button type="submit" class="px-1 rounded-md bg-red-500 flex items-center cursor-pointer hover:bg-red-600">

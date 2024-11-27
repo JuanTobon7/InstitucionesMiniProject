@@ -2,8 +2,8 @@
 class Database {
     private $host = "localhost";
     private $dbname = "instituciones";
-    private $user = "juan";
-    private $password = "Juan316";
+    private $user = "jhonmatt";
+    private $password = "113355Matt";
     private $pdo;
 
     public function __construct() {
