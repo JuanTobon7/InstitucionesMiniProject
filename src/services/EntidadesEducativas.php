@@ -84,15 +84,16 @@
         
         public function getByAcademicCHaracterById($caracterAcademico){
             $query = "
-                SELECT instP.nomb_inst,mun.nomb_munic,dept.nomb_depto,inst.direccion,cad.nomb_academ
-                FROM instituciones instP
-                JOIN cobertura c ON c.cod_inst = instP.cod_inst
-                JOIN municipios mun ON mun.cod_munic = c.cod_munic
-                JOIN departamentos dept ON dept.cod_depto = mun.cod_depto
-                JOIN inst_por_municipio inst  ON inst.cod_inst = instP.cod_inst
-                JOIN caracter_academico cad ON cad.cod_academ = instP.cod_academ
-                 WHERE cad.cod_academ = :caracter_academico;
-            ";
+                SELECT i.nomb_inst,i.cod_inst ,sec.nomb_sector, ac.nomb_admon,car.nomb_academ,mun.nomb_munic,dep.nomb_depto, es.nomb_estado, inst.programas_vigente, inst.acreditada FROM instituciones i 
+                        JOIN sectores sec ON i.cod_sector=sec.cod_sector
+                        JOIN caracter_academico car ON i.cod_academ=car.cod_academ
+                        JOIN inst_por_municipio inst ON i.cod_inst=inst.cod_inst
+                        JOIN municipios mun ON inst.cod_munic=mun.cod_munic
+                        JOIN estados es ON inst.cod_estado=es.cod_estado
+                        JOIN departamentos dep ON mun.cod_depto=dep.cod_depto
+                        JOIN acto_admon ac ON ac.cod_admon=inst.cod_admon
+                        WHERE car.cod_academ = :caracter_academico
+                        ORDER BY i.nomb_inst ASC;";
             $stms = $this->db->prepare($query);
             $stms->bindParam('caracter_academico',$caracterAcademico);
             $stms->execute();
@@ -100,13 +101,15 @@
         }        
         public function getByAcademicCHaracter(){
             $query = "
-                SELECT instP.nomb_inst,mun.nomb_munic,dept.nomb_depto,inst.direccion,cad.nomb_academ
-                FROM instituciones instP
-                JOIN cobertura c ON c.cod_inst = instP.cod_inst
-                JOIN municipios mun ON mun.cod_munic = c.cod_munic
-                JOIN departamentos dept ON dept.cod_depto = mun.cod_depto
-                JOIN inst_por_municipio inst  ON inst.cod_inst = instP.cod_inst
-                JOIN caracter_academico cad ON cad.cod_academ = instP.cod_academ;
+               SELECT i.nomb_inst,i.cod_inst ,sec.nomb_sector, ac.nomb_admon,car.nomb_academ,mun.nomb_munic,dep.nomb_depto, es.nomb_estado, inst.programas_vigente, inst.acreditada FROM instituciones i 
+                        JOIN sectores sec ON i.cod_sector=sec.cod_sector
+                        JOIN caracter_academico car ON i.cod_academ=car.cod_academ
+                        JOIN inst_por_municipio inst ON i.cod_inst=inst.cod_inst
+                        JOIN municipios mun ON inst.cod_munic=mun.cod_munic
+                        JOIN estados es ON inst.cod_estado=es.cod_estado
+                        JOIN departamentos dep ON mun.cod_depto=dep.cod_depto
+                        JOIN acto_admon ac ON ac.cod_admon=inst.cod_admon
+                        ORDER BY i.nomb_inst ASC;
             ";
             $stms = $this->db->prepare($query);
             $stms->execute();

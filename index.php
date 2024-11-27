@@ -36,7 +36,6 @@
     $sectores = [];
 
     $tiposActo = $entidadesEducativas->actoAdmin();
-    echo "<p> holla $caracterSeleccionado </p>";
     #por reporte
     $institucionesReporteAcadem = [];
     $institucionesCaracter = [];
@@ -244,7 +243,7 @@
                         </tr>
                     </thead>
                     <tbody>                    
-                        <?php foreach ($institucionesReporteAcadem as $fila): ?>
+                        <?php foreach ($institucionesCaracter as $fila): ?>
                             <tr class="hover:bg-gray-100">
                                 <td class="py-2 px-4 border-b"><?php echo htmlspecialchars($fila['nomb_inst']); ?></td>
                                 <td class="py-2 px-4 border-b"><?php echo htmlspecialchars($fila['cod_inst']); ?></td>
@@ -260,6 +259,7 @@
                     </tbody>
                 </table>
             </div>
+        </section>
         <?php elseif ($tipoEstadistica == "3"): ?>
             <div class="bg-white shadow-md rounded-lg px-4 pb-4">
                 <div class="flex items-center justify-between px-4 pt-20 mb-2">

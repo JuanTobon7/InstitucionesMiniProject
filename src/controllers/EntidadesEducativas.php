@@ -68,7 +68,6 @@ class EntidadesEducativas {
     }
     public function getByAcademicCHaracter($caracterAcademico){
         $entidadesEducativas = null;
-        printf("hellooooouuuuu".$caracterAcademico);
         if($caracterAcademico == null){
             $entidadesEducativas = $this->service->getByAcademicCHaracter();
         }else{            
