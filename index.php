@@ -29,32 +29,35 @@
     $actoNoRepeat = $actoCtrl->getAll();
 
     $instituciones = [];
-    $institucionesPorCaracterAcademico = $estadistica->getStatisticsByAcademicCharacter();
+    $institucionesPorCaracterAcademico = $estadistica->getStatisticsByAcademicCharacter($departamentoSeleccionado);
     $institucionesPorSectorDepartamento = [];
     $institucionesPorActoAdmon = [];
     $institucionesPorNormaCreacion = $estadistica->getStatisticsByCreationNorm();
     $sectores = [];
 
     $tiposActo = $entidadesEducativas->actoAdmin();
-
+    echo "<p> holla $caracterSeleccionado </p>";
     #por reporte
     $institucionesReporteAcadem = [];
     $institucionesCaracter = [];
     $institucionesSector = [];
-
     if($departamentoSeleccionado != null){
         $instituciones = $estadistica->getInstitutionsByDepartmentById($departamentoSeleccionado);
         $institucionesReporteAcadem = $estadistica->getInstByAcademic($caracterSeleccionado);
+        
         $institucionesPorSectorDepartamento = $estadistica->getStatisticsBySectorAndDepartmentById($departamentoSeleccionado,$sectorSeleccionado);
-        $institucionesPorActoAdmon = $estadistica->getStatisticsByAdministrativeActById($actoSeleccionado);
     }else{
         $instituciones = $estadistica->getInstitutionsByDepartment();
-        $institucionesPorSectorDepartamento = $estadistica->getStatisticsBySectorAndDepartment();
+        $institucionesPorSectorDepartamento = $estadistica->getStatisticsBySectorAndDepartment($sectorSeleccionado);
         $institucionesCaracter = $entidadesEducativas->getByAcademicCHaracter($caracterSeleccionado);
         $institucionesSector = $entidadesEducativas->instBySector($sectorSeleccionado);
     }
+    if($actoSeleccionado != null){
+        $institucionesPorActoAdmon = $estadistica->getStatisticsByAdministrativeActById($actoSeleccionado);
+    }else{
+        $institucionesPorActoAdmon = $estadistica->getStatisticsByAdministrativeAct();
+    }
     // Inicializar valores
-   /*
     // Formatear los datos para JavaScript
     $departamentos = [];
     $institucionesActivas = [];
@@ -78,44 +81,29 @@
             $institucionesActivas[] = 0; // Para mantener el índice alineado
         }
     }
-
-    foreach ($institucionesPorCaracterAcademico as $caracter) {
-        $tiposCaracterAcademico[] = $caracter['nomb_academ'];
-        $totalInstitucionesPorCaracter[] = $caracter['total_inst'];
-    }
-
-    foreach ($institucionesPorSectorDepartamento as $sector) {
-        $sectores[] = $sector['nomb_depto'];
-        if ($sector['nomb_sector'] == 'privado') {
-            $institucionesPrivadas[] = $sector['total_inst'];
-            $institucionesPublicas[] = 0;
-        } else {
-            $institucionesPublicas[] = $sector['total_inst'];
-            $institucionesPrivadas[] = 0;
-        }
-    }
-
-    foreach ($institucionesPorActoAdmon as $acto) {
-        $actosAdministrativos[] = $acto['nomb_admon'];
-        $totalInstitucionesPorActo[] = $acto['total_inst'];
-    }
-
+    
     foreach ($institucionesPorNormaCreacion as $norma) {
         $normasCreacion[] = $norma['nomb_norma'];
         $totalInstitucionesPorNorma[] = $norma['total_inst'];
-    }*/
-?>
+    }
+    
+    foreach ($institucionesPorNormaCreacion as $norma) {
+        $normasCreacion[] = $norma['nomb_norma'];
+        $totalInstitucionesPorNorma[] = $norma['total_inst'];
+    }
+    ?>
 
-<?php include './src/components/Header.php'; ?>
-<body class="bg-gray-100">
+    <?php include './src/components/Header.php'; ?>
+    <body class="bg-gray-100">
 
+        <?php include './src/components/navBar.php'; ?>
+        <?php include './src/components/Menu.php'; ?>
         <?php include './src/components/navBar.php'; ?>
         <?php include './src/components/Menu.php'; ?>
 
         <section class="h-screen ml-[25vh] px-4 py-16">
-                <h1 class="text-3xl font-bold px-4 mb-4">Reportes y Estadísticas de Instituciones</h1>
-
-                <form method="POST" action="" class="flex flex-col gap-4 px-4 py-4 bg-white shadow-md rounded-md">
+            <h1 class="text-3xl font-bold px-4 mb-4">Reportes y Estadísticas de Instituciones</h1>                
+            <form method="POST" action="" class="flex flex-col gap-4 px-4 py-4 bg-white shadow-md rounded-md">
                 <h2 class="text-xl font-semibold mb-2">Selecciona la Estadística a Consultar</h2>
 
                 <div>
@@ -198,8 +186,7 @@
                     <button type="reset" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">Cancelar</button>
                     <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Confirmar</button>
                 </div>
-            </form>
-
+            </form>                
 
         <?php if ($tipoEstadistica == "1"): ?>
             <div class="bg-white shadow-md rounded-lg px-4 pb-4">
@@ -346,6 +333,14 @@
                     </tbody>
                 </table>
             </div>
+          
+        <?php elseif ($tipoEstadistica == "5"): ?>
+            <h2 class="text-2xl font-bold px-4 mb-2">Instituciones por Norma de Creación</h2>
+            <div class="bg-white shadow-md rounded-lg p-4 mb-4">
+                <div class="max-w-md mx-auto">
+                    <canvas id="institucionesPorNormaCreacion" class="w-full h-auto"></canvas>
+                </div>
+            </div>
         <?php endif; ?>
 
         </section>
@@ -398,181 +393,8 @@
             toggleEleccion();
         });
         
-            if(tipoEstadistica == '1'){            
-
-                const ctxDepartamentos = document.getElementById('institucionesPorDepartamento').getContext('2d');
-                const chartDepartamentos = new Chart(ctxDepartamentos, {
-                    type: 'bar',
-                    data: {
-                        labels: departamentos,
-                        datasets: [
-                            {
-                                label: 'Instituciones Activas',
-                                data: institucionesActivas,
-                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Instituciones Inactivas',
-                                data: institucionesInactivas,
-                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                borderWidth: 1
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            }
-            else if(tipoEstadistica == '2'){
-
-                // Configuración del gráfico de instituciones por carácter académico
-                const ctxCaracterAcademico = document.getElementById('institucionesPorCaracterAcademico').getContext('2d');
-                const chartCaracterAcademico = new Chart(ctxCaracterAcademico, {
-                    type: 'pie',
-                    data: {
-                        labels: tiposCaracterAcademico,
-                        datasets: [
-                            {
-                                label: 'Total de Instituciones',
-                                data: totalInstitucionesPorCaracter,
-                                backgroundColor: [
-                                    'rgba(54, 162, 235, 0.5)', // Azul
-                                    'rgba(255, 99, 132, 0.5)', // Rojo
-                                    'rgba(75, 192, 192, 0.5)', // Verde
-                                    'rgba(255, 206, 86, 0.5)', // Amarillo
-                                    'rgba(153, 102, 255, 0.5)', // Morado
-                                    'rgba(255, 159, 64, 0.5)', // Naranja
-                                    'rgba(201, 203, 207, 0.5)' // Gris
-                                ],
-                                borderColor: [
-                                    'rgba(54, 162, 235, 1)',
-                                    'rgba(255, 99, 132, 1)',
-                                    'rgba(75, 192, 192, 1)',
-                                    'rgba(255, 206, 86, 1)',
-                                    'rgba(153, 102, 255, 1)',
-                                    'rgba(255, 159, 64, 1)',
-                                    'rgba(201, 203, 207, 1)'
-                                ],
-                                borderWidth: 1
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top',
-                                labels: {
-                                    font: {
-                                        size: 14
-                                    }
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(tooltipItem) {
-                                        return `${tooltipItem.label}: ${tooltipItem.raw} instituciones`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-            else if(tipoEstadistica == '3'){            
-                // Configuración del gráfico de instituciones por sector en cada departamento
-                const ctxSector = document.getElementById('institucionesPorSector').getContext('2d');
-                const chartSector = new Chart(ctxSector, {
-                    type: 'bar',
-                    data: {
-                        labels: sectores,
-                        datasets: [
-                            {
-                                label: 'Total de Privadas',
-                                data: institucionesPrivadas,
-                                backgroundColor: 'rgba(153, 102, 255, 0.5)', // Color morado
-                                borderColor: 'rgba(153, 102, 255, 1)',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Total de Públicas',
-                                data: institucionesPublicas,
-                                backgroundColor: 'rgba(255, 159, 64, 0.5)', // Color naranja
-                                borderColor: 'rgba(255, 159, 64, 1)',
-                                borderWidth: 1
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            }
-            else if(tipoEstadistica == '4'){
-                // Configuración del gráfico de instituciones por acto administrativo
-                const ctxActoAdmon = document.getElementById('institucionesPorActoAdmon').getContext('2d');
-                const chartActoAdmon = new Chart(ctxActoAdmon, {
-                    type: 'pie',
-                    data: {
-                        labels: actosAdministrativos,
-                        datasets: [
-                            {
-                                label: 'Total de Instituciones',
-                                data: totalInstitucionesPorActo,
-                                backgroundColor: [
-                                    'rgba(255, 99, 132, 0.5)', // Rojo
-                                    'rgba(54, 162, 235, 0.5)', // Azul
-                                    'rgba(255, 206, 86, 0.5)', // Amarillo
-                                    'rgba(75, 192, 192, 0.5)' // Verde
-                                ],
-                                borderColor: [
-                                    'rgba(255, 99, 132, 1)',
-                                    'rgba(54, 162, 235, 1)',
-                                    'rgba(255, 206, 86, 1)',
-                                    'rgba(75, 192, 192, 1)'
-                                ],
-                                borderWidth: 1
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top',
-                                labels: {
-                                    font: {
-                                        size: 14
-                                    }
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(tooltipItem) {
-                                        return `${tooltipItem.label}: ${tooltipItem.raw} instituciones`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }else if(tipoEstadistica == '5'){
+           
+            if(tipoEstadistica == '5'){
                 // Configuración del gráfico de instituciones por norma de creación
                 const ctxNormaCreacion = document.getElementById('institucionesPorNormaCreacion').getContext('2d');
                 const chartNormaCreacion = new Chart(ctxNormaCreacion, {
@@ -584,23 +406,34 @@
                                 label: 'Total de Instituciones',
                                 data: totalInstitucionesPorNorma,
                                 backgroundColor: [
-                                    'rgba(54, 162, 235, 0.5)', // Azul
+                                    'rgba(54, 162, 235, 0.5)', // Azul claro
                                     'rgba(255, 99, 132, 0.5)', // Rojo
-                                    'rgba(75, 192, 192, 0.5)', // Verde
-                                    'rgba(255, 206, 86, 0.5)', // Amarillo
+                                    'rgba(255, 205, 86, 0.5)', // Amarillo
+                                    'rgba(75, 192, 192, 0.5)', // Verde agua
                                     'rgba(153, 102, 255, 0.5)', // Morado
                                     'rgba(255, 159, 64, 0.5)', // Naranja
-                                    'rgba(201, 203, 207, 0.5)' // Gris
+                                    'rgba(201, 203, 207, 0.5)', // Gris
+                                    'rgba(105, 159, 201, 0.5)', // Azul acero
+                                    'rgba(255, 142, 142, 0.5)', // Rosa
+                                    'rgba(138, 238, 73, 0.5)',  // Verde lima
+                                    'rgba(249, 159, 208, 0.5)', // Fucsia
+                                    'rgba(144, 238, 144, 0.5)'  // Verde claro
                                 ],
                                 borderColor: [
-                                    'rgba(54, 162, 235, 1)',
-                                    'rgba(255, 99, 132, 1)',
-                                    'rgba(75, 192, 192, 1)',
-                                    'rgba(255, 206, 86, 1)',
-                                    'rgba(153, 102, 255, 1)',
-                                    'rgba(255, 159, 64, 1)',
-                                    'rgba(201, 203, 207, 1)'
+                                    'rgba(54, 162, 235, 1)', 
+                                    'rgba(255, 99, 132, 1)', 
+                                    'rgba(255, 205, 86, 1)', 
+                                    'rgba(75, 192, 192, 1)', 
+                                    'rgba(153, 102, 255, 1)', 
+                                    'rgba(255, 159, 64, 1)', 
+                                    'rgba(201, 203, 207, 1)', 
+                                    'rgba(105, 159, 201, 1)', 
+                                    'rgba(255, 142, 142, 1)', 
+                                    'rgba(138, 238, 73, 1)', 
+                                    'rgba(249, 159, 208, 1)', 
+                                    'rgba(144, 238, 144, 1)'
                                 ],
+
                                 borderWidth: 1
                             }
                         ]
