@@ -1,12 +1,12 @@
 <?php 
     include '../../components/Header.php'; 
-    require_once '../../controllers/EntidadesEducativas.php';
-    require_once '../../controllers/CaracterAcademico.php';
+    require_once '../../controllers/Instituciones.php';
+    require_once '../../controllers/Academico.php';
     require_once '../../controllers/Sectores.php';
      
     // Crear instancias de los controladores
-    $entidadesEducativas = new EntidadesEducativas();
-    $caracterAcademico = new CaracterAcademico();
+    $entidadesEducativas = new Instituciones();
+    $caracterAcademico = new Academico();
     $sector = new Sectores();
     
     // Obtener los datos de sectores y caracteres académicos

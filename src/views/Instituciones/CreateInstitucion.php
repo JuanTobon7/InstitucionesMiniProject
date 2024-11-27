@@ -1,10 +1,10 @@
 <?php
-    require_once '../../controllers/CaracterAcademico.php';
+    require_once '../../controllers/Academico.php';
     require_once '../../controllers/Sectores.php';
     require_once '../../components/Header.php';
 
-
-    $caracterAcademico = new CaracterAcademico();
+    session_start();
+    $caracterAcademico = new Academico();
     $caracteresAcademicos = $caracterAcademico->getAll();
 
     $sectores = new Sectores();
@@ -23,6 +23,14 @@
                 <h2 class="text-3xl font-bold">Crear Institución</h2>
                 <form action="../../controllers/EntidadesEducativas.php?action=create" method="POST" class="w-full flex flex-col gap-3 py-2 mb-2">
                     <div class="block px-2"> 
+                        <?php if (isset($_SESSION['error'])): ?>
+                            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                                <strong class="font-bold">¡Error!</strong>
+                                <span class="block sm:inline"><?php echo $_SESSION['error']; ?></span>
+                            </div>
+                            <?php unset($_SESSION['error']); // Limpia el mensaje de error después de mostrarlo ?>
+                        <?php endif; ?>
+
                         <label for="name" class="text-gray-800 mb-2">
                             Nombre de la institución
                         </label>

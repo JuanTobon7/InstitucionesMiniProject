@@ -1,17 +1,17 @@
 <?php
-require_once __DIR__.'/../database/index.php';
-
-class DepartamentosService {
+class ActoService {
     private $db;
+
     public function __construct(Database $db) {
         $this->db = $db->getConnection();
     }
+
     public function getAll(){
-        $query = 'SELECT cod_depto,nomb_depto FROM departamentos;';
+        $query = 'SELECT * FROM acto_admon;';
         $stmt = $this->db->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll();
-    }
+    }    
+    
 }
-
 ?>

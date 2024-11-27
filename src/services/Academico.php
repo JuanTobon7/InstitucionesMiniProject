@@ -1,6 +1,6 @@
 <?php
     require_once __DIR__.'/../database/index.php';
-    class CaracterAcademicoService {
+    class AcademicoServices {
         private $db;
 
         public function __construct(Database $db) {
@@ -12,7 +12,7 @@
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll();
-        }
+        }    
         
     }
 ?>

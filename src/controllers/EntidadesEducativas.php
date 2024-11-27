@@ -19,6 +19,7 @@ class EntidadesEducativas {
 
     public function __construct() {
         $this->service = new EntidadesEducativasService(new Database());
+        session_start();
     }
 
     public function getAll(){
@@ -31,9 +32,18 @@ class EntidadesEducativas {
         $sector = $_POST['cod_sector'];
         $caracterAcademico = $_POST['cod_academ'];
         $id = $this->generateTimeBasedId();
-        $this->service->create($id,$name, $sector, $caracterAcademico);
+        $result = $this->service->create($id,$name, $sector, $caracterAcademico);
+        echo $result;
+        // Verifica si hubo un error
+        if (isset($result['error'])) {
+            // Redirige al formulario con el mensaje de error
+            $_SESSION['error'] = "El nombre ".$name. " ya se encuentra en uso";
+            header('Location: /src/views/Instituciones/CreateInstitucion.php');
+            exit();
+        }
         header('Location: /src/views/Instituciones/InstitucionesView.php');
         exit;
+        
     }
 
     public function update(){
@@ -53,29 +63,26 @@ class EntidadesEducativas {
         exit;
     }
 
-    public function getStadistcByDepStatus(){
-        $entidadesEducativas = $this->service->getStadistcByDepStatus();
+    public function getInstByDeptStatus($codEstado,$codDept){
+        return $this->service->getInstByDeptStatus($codEstado,$codDept);
+    }
+    public function getByAcademicCHaracter($caracterAcademico){
+        $entidadesEducativas = $this->service->getByAcademicCHaracter($caracterAcademico);
+        return $entidadesEducativas;
+    }
+    public function instBySector($codSector){
+        $entidadesEducativas = $this->service->instBySector($codSector);
         return $entidadesEducativas;
     }
 
-    public function stadisticsByAcademicCharacter(){
-        $entidadesEducativas = $this->service->stadisticsByAcademicCharacter();
+    public function instBySectorDept($codSector,$codDept){
+        $entidadesEducativas = $this->service->instBySectorDept($codSector,$codDept);
         return $entidadesEducativas;
     }
-
-    public function stadisticBySectorDept(){
-        $entidadesEducativas = $this->service->stadisticBySectorDept();
-        return $entidadesEducativas;
+    public function actoAdmin(){
+        $tipoActo = $this->service->actoAdmin();
+        return $tipoActo;
     }
-    public function stadisticByActoAdmon(){
-        $entidadesEducativas = $this->service->stadisticByActoAdmon();
-        return $entidadesEducativas;
-    }
-    public function stadisticByNormaCreacion(){
-        $entidadesEducativas = $this->service->stadisticByNormaCreacion();
-        return $entidadesEducativas;
-    }
-
 }
 
 $entidadesEducativas = new EntidadesEducativas();
